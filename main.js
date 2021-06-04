@@ -1,29 +1,40 @@
 import './style.css'
 
+// Import the THREE.js library
 import * as THREE from 'three';
+// Import OrbitControls which allow users to easily pan and zoom through a scene
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
+// Create the main scene (this is where all the action is going to take place).
 const scene = new THREE.Scene();
 
+// Create a camera, for a user to actually see what's going on in the scene. Think of what we're doing as if we were creating a movie.
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
+// Initialize a renderer. This is what's going to handle all the graphics we're going to be throwing onto the scene.
 const renderer = new THREE.WebGLRenderer({
   canvas: document.querySelector('#bg'),
 });
 
+// We can determine the pixel ratio by the window size of the user
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 
+// Set the initial camera positions
 camera.position.setZ(30);
 camera.position.setY(50);
 
+// Use the initialized renderer we initialized earlier to add the scene and camera to the render pipeline.
 renderer.render(scene,camera);
 
+// Create a pointlight (this is exactly what it sounds like)
 const pointLight = new THREE.PointLight(0xffffff);
 pointLight.position.set(0,0,0)
 
+// Create an ambient light (this is a light that basically shows up on the entire scene)
 const ambientLight = new THREE.AmbientLight(0xffffff);
 scene.add(pointLight, ambientLight);
+
 
 const lightHelper = new THREE.PointLightHelper(pointLight)
 const gridHelper = new THREE.GridHelper(3000,100)
