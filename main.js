@@ -35,35 +35,40 @@ pointLight.position.set(0,0,0)
 const ambientLight = new THREE.AmbientLight(0xffffff);
 scene.add(pointLight, ambientLight);
 
-
+// Initialize cool helpers so we can see what we're doing better. 
+// The grid helper gives us a grid so we can see if things are actually lined up.
+// The light helper shows us where exactly our light source is coming from.
 const lightHelper = new THREE.PointLightHelper(pointLight)
 const gridHelper = new THREE.GridHelper(3000,100)
 scene.add(gridHelper, lightHelper)
 
+// Initialize the Orbit Controls
 const controls = new OrbitControls(camera, renderer.domElement);
 
+// Bring in our space texture for the background image of the entire scene.
 const spaceTexture = new THREE.TextureLoader().load('images/milkywaybackground.jpeg')
 scene.background = spaceTexture;
 
+// This is a normal texture that we're going to use for rocky worlds with no atmosphere like mercury and mars. 
+// Normals are often used if we want to add some bumps or other effects to a regular flat texture.
 const normalTexture = new THREE.TextureLoader().load('images/normal.jpeg')
+
+// This is the section where we add the sun and all of its planets. 
+// As of now I have everything as a child of the sun.
 
 // Sun
 const sunTexture = new THREE.TextureLoader().load('images/sun.jpeg')
-
 const sun = new THREE.Mesh(
   new THREE.SphereGeometry(10,32,32),
   new THREE.MeshStandardMaterial({
     map: sunTexture,
   })
 );
-
 scene.add(sun)
-
 sun.position.z = 1;
 
 // Mercury
 const mercuryTexture = new THREE.TextureLoader().load('images/mercury.jpeg')
-
 const mercury = new THREE.Mesh(
   new THREE.SphereGeometry(2,32,32),
   new THREE.MeshStandardMaterial({
@@ -72,13 +77,11 @@ const mercury = new THREE.Mesh(
   }
   )
 );
-
 mercury.position.z = 1;
 mercury.position.setX(-20);
 
 // Venus
 const venusTexture = new THREE.TextureLoader().load('images/venus.jpeg')
-
 const venus = new THREE.Mesh(
   new THREE.SphereGeometry(3,32,32),
   new THREE.MeshStandardMaterial({
@@ -86,14 +89,12 @@ const venus = new THREE.Mesh(
   }
   )
 );
-
 venus.position.z = 1;
 venus.position.setX(-35);
 
 // Earth
 const earthTexture = new THREE.TextureLoader().load('images/earth.jpeg')
 const earthNormalTexture = new THREE.TextureLoader().load('images/earth-normal-map.tiff')
-
 const earth = new THREE.Mesh(
   new THREE.SphereGeometry(3,32,32),
   new THREE.MeshStandardMaterial({
@@ -101,13 +102,11 @@ const earth = new THREE.Mesh(
     normalMap: earthNormalTexture
   })
 );
-
 earth.position.z = 1;
 earth.position.setX(-50);
 
 // Mars
 const marsTexture = new THREE.TextureLoader().load('images/mars.jpeg')
-
 const mars = new THREE.Mesh(
   new THREE.SphereGeometry(2.5,32,32),
   new THREE.MeshStandardMaterial({
@@ -115,16 +114,14 @@ const mars = new THREE.Mesh(
     normalMap: normalTexture
   })
 );
-
 mars.position.z = 1;
 mars.position.setX(-80);
 
-// Asteroid Belt
+// Asteroid Belt (Note: as of now the asteroid belt is a flat torus, but we'll fix that in due time)
 const asteroidBeltPlaceholder = new THREE.Mesh(
-  new THREE.TorusGeometry(150,5,5,100),
+  new THREE.TorusGeometry(150,2,2,100),
   new THREE.MeshBasicMaterial( { color: 0xffff00, wireFrame: true  })
 )
-
 asteroidBeltPlaceholder.position.z = 1;
 asteroidBeltPlaceholder.position.setX(0)
 asteroidBeltPlaceholder.rotateX( Math.PI / 2 );
@@ -132,21 +129,17 @@ scene.add(asteroidBeltPlaceholder)
 
 // Jupiter
 const jupiterTexture = new THREE.TextureLoader().load('images/jupiter.jpeg')
-
 const jupiter = new THREE.Mesh(
   new THREE.SphereGeometry(5,32,32),
   new THREE.MeshStandardMaterial({
     map: jupiterTexture,
   })
 );
-
-
 jupiter.position.z = 1;
 jupiter.position.setX(-260);
 
-// Saturn
+// Saturn (saturn has rings that are a child to saturn)
 const saturnTexture = new THREE.TextureLoader().load('images/saturn.jpeg')
-
 const saturn = new THREE.Mesh(
   new THREE.SphereGeometry(4,32,32),
   new THREE.MeshStandardMaterial({
@@ -154,51 +147,43 @@ const saturn = new THREE.Mesh(
   })
 );
 
-
 saturn.position.z = 1;
 saturn.position.setX(-500);
 
 // Saturn Rings
 const saturnRingsTexture = new THREE.TextureLoader().load('images/saturn-ring.png')
-
 const saturnRings = new THREE.Mesh(
   new THREE.TorusGeometry(9,0.5,32,100),
   new THREE.MeshStandardMaterial({
     map: saturnRingsTexture
   })
 )
-
 saturn.add(saturnRings)
 saturnRings.rotateX(240);
 
 // Uranus
 const uranusTexture = new THREE.TextureLoader().load('images/uranus.jpeg')
-
 const uranus = new THREE.Mesh(
   new THREE.SphereGeometry(4,32,32),
   new THREE.MeshStandardMaterial({
     map: uranusTexture,
   })
 );
-
-
 uranus.position.z = 1;
 uranus.position.setX(-970);
 
 // Neptune
 const neptuneTexture = new THREE.TextureLoader().load('images/neptune.jpeg')
-
 const neptune = new THREE.Mesh(
   new THREE.SphereGeometry(4,32,32),
   new THREE.MeshStandardMaterial({
     map: neptuneTexture,
   })
 );
-
-
 neptune.position.z = 1;
 neptune.position.setX(-1940);
 
+// Add Each planet as a child to the sun
 sun.add(mercury)
 sun.add(venus)
 sun.add(earth)
@@ -207,23 +192,13 @@ sun.add(jupiter)
 sun.add(saturn)
 sun.add(uranus)
 sun.add(neptune)
-//sun.add(asteroidBeltPlaceholder)
 
-// Game Loop
+// Game Loop (this is the main function where everything takes place)
 function animate() {
   requestAnimationFrame(animate);
 
+  // Set rotation speed of each planetary object
   sun.rotation.y += 0.002;
-  rotateAboutPoint(mercury, new THREE.Vector3(sun.x, sun.y, sun.z), new THREE.Vector3(0, .9, 0), THREE.Math.degToRad(1), true)
-  rotateAboutPoint(venus, new THREE.Vector3(sun.x, sun.y, sun.z), new THREE.Vector3(0, -.319, 0), THREE.Math.degToRad(1), true)
-  rotateAboutPoint(earth, new THREE.Vector3(sun.x, sun.y, sun.z), new THREE.Vector3(0, .194, 0), THREE.Math.degToRad(1), true)
-  rotateAboutPoint(mars, new THREE.Vector3(sun.x, sun.y, sun.z), new THREE.Vector3(0, .129, 0), THREE.Math.degToRad(1), true)
-  //rotateAboutPoint(asteroidBeltPlaceholder, new THREE.Vector3(sun.x, sun.y, sun.z), new THREE.Vector3(0, .129, 0), THREE.Math.degToRad(1), true)
-  rotateAboutPoint(jupiter, new THREE.Vector3(sun.x, sun.y, sun.z), new THREE.Vector3(0, .09, 0), THREE.Math.degToRad(1), true)
-  rotateAboutPoint(saturn, new THREE.Vector3(sun.x, sun.y, sun.z), new THREE.Vector3(0, .03, 0), THREE.Math.degToRad(1), true)
-  rotateAboutPoint(uranus, new THREE.Vector3(sun.x, sun.y, sun.z), new THREE.Vector3(0, .05, 0), THREE.Math.degToRad(1), true)
-  rotateAboutPoint(neptune, new THREE.Vector3(sun.x, sun.y, sun.z), new THREE.Vector3(0, .01, 0), THREE.Math.degToRad(1), true)
-
   mercury.rotation.y += 0.005;
   venus.rotation.y += 0.001;
   earth.rotation.y += 0.01;
@@ -233,13 +208,23 @@ function animate() {
   uranus.rotation.y += 0.03;
   neptune.rotation.y += 0.03;
 
+  // rotateAboutPoint makes an object rotate on a designated pivot point
+  rotateAboutPoint(mercury, new THREE.Vector3(sun.x, sun.y, sun.z), new THREE.Vector3(0, .9, 0), THREE.Math.degToRad(1), true)
+  rotateAboutPoint(venus, new THREE.Vector3(sun.x, sun.y, sun.z), new THREE.Vector3(0, -.319, 0), THREE.Math.degToRad(1), true)
+  rotateAboutPoint(earth, new THREE.Vector3(sun.x, sun.y, sun.z), new THREE.Vector3(0, .194, 0), THREE.Math.degToRad(1), true)
+  rotateAboutPoint(mars, new THREE.Vector3(sun.x, sun.y, sun.z), new THREE.Vector3(0, .129, 0), THREE.Math.degToRad(1), true)
+  rotateAboutPoint(jupiter, new THREE.Vector3(sun.x, sun.y, sun.z), new THREE.Vector3(0, .09, 0), THREE.Math.degToRad(1), true)
+  rotateAboutPoint(saturn, new THREE.Vector3(sun.x, sun.y, sun.z), new THREE.Vector3(0, .03, 0), THREE.Math.degToRad(1), true)
+  rotateAboutPoint(uranus, new THREE.Vector3(sun.x, sun.y, sun.z), new THREE.Vector3(0, .05, 0), THREE.Math.degToRad(1), true)
+  rotateAboutPoint(neptune, new THREE.Vector3(sun.x, sun.y, sun.z), new THREE.Vector3(0, .01, 0), THREE.Math.degToRad(1), true)
 
-
+  // update the Orbit Controls on each frame
   controls.update();
-
+  // Render every update to the scene and camera
   renderer.render(scene,camera);
 }
 
+// Now call the animate function to set everything in motion
 animate();
 
 // obj - your object (THREE.Object3D or derived)
