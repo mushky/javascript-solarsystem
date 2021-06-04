@@ -263,18 +263,3 @@ function addStar() {
 }
 
 //Array(200).fill().forEach(addStar);
-
-// function moveCamera() {
-
-//   const t = document.body.getBoundingClientRect().top;
-
-//   //mercury.rotation.y += 0.075;
-//   //mercury.rotation.z += 0.05;
-
-//   camera.position.z = t * -0.01;
-//   camera.position.x = t * -0.0002;
-//   camera.position.y = t * -0.002;
-
-// }
-
-//document.body.onscroll = moveCamera
