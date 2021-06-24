@@ -9,7 +9,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 const scene = new THREE.Scene();
 
 // Create a camera, for a user to actually see what's going on in the scene. Think of what we're doing as if we were creating a movie.
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(100, window.innerWidth / window.innerHeight, 0.1, 1000);
 
 // Initialize a renderer. This is what's going to handle all the graphics we're going to be throwing onto the scene.
 const renderer = new THREE.WebGLRenderer({
@@ -21,30 +21,59 @@ renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 
 // Set the initial camera positions
-camera.position.setZ(30);
-camera.position.setY(50);
+camera.position.setZ(130);
+camera.position.setY(150);
 
 // Use the initialized renderer we initialized earlier to add the scene and camera to the render pipeline.
 renderer.render(scene,camera);
 
 // Create a pointlight (this is exactly what it sounds like)
-const pointLight = new THREE.PointLight(0xffffff);
-pointLight.position.set(0,0,0)
+const pointLightNorth = new THREE.PointLight(0xdfffff,0.9);
+pointLightNorth.position.set(0,50,0)
+
+const pointLightSouth = new THREE.PointLight(0xdfffff,0.9);
+pointLightSouth.position.set(0,-50,0)
+
+const pointLightWest = new THREE.PointLight(0xdfffff,0.9);
+pointLightWest.position.set(-50,0,0)
+
+const pointLightEast = new THREE.PointLight(0xdfffff,0.9);
+pointLightEast.position.set(50,0,0)
+
+const pointLightNorthWest = new THREE.PointLight(0xdfffff,0.9);
+pointLightNorthWest.position.set(0,0,50)
+
+const pointLightNorthEast = new THREE.PointLight(0xdfffff,0.9);
+pointLightNorthEast.position.set(-0,0,-50)
 
 // Create an ambient light (this is a light that basically shows up on the entire scene)
 const ambientLight = new THREE.AmbientLight(0xffffff);
-scene.add(pointLight, ambientLight);
+scene.add(pointLightNorth,pointLightSouth,pointLightWest,pointLightEast,pointLightNorthWest,pointLightNorthEast);
 
 // Initialize cool helpers so we can see what we're doing better. 
 // The grid helper gives us a grid so we can see if things are actually lined up.
 // The light helper shows us where exactly our light source is coming from.
-const lightHelper = new THREE.PointLightHelper(pointLight)
-const gridHelper = new THREE.GridHelper(3000,100)
-scene.add(gridHelper, lightHelper)
+const lightHelperNorth = new THREE.PointLightHelper(pointLightNorth)
+const lightHelperSouth = new THREE.PointLightHelper(pointLightSouth)
+const lightHelperWest = new THREE.PointLightHelper(pointLightWest)
+const lightHelperEast = new THREE.PointLightHelper(pointLightEast)
+const lightHelperNorthWest = new THREE.PointLightHelper(pointLightNorthWest)
+const lightHelperNorthEast = new THREE.PointLightHelper(pointLightNorthEast)
 
+const gridHelper = new THREE.GridHelper(2200,100)
+scene.add(gridHelper)
+//scene.add(lightHelperNorth,lightHelperSouth,lightHelperWest,lightHelperEast,lightHelperNorthWest,lightHelperNorthEast)
 // Initialize the Orbit Controls
 const controls = new OrbitControls(camera, renderer.domElement);
+// How far you can orbit vertically, upper and lower limits.
+// Range is 0 to Math.PI radians.
+controls.minPolarAngle = 0; // radians
+controls.maxPolarAngle = Math.PI; // radians
 
+// How far you can orbit horizontally, upper and lower limits.
+// If set, must be a sub-interval of the interval [ - Math.PI, Math.PI ].
+controls.minAzimuthAngle = - Infinity; // radians
+controls.maxAzimuthAngle = Infinity; // radians
 // Bring in our space texture for the background image of the entire scene.
 const spaceTexture = new THREE.TextureLoader().load('images/milkywaybackground.jpeg')
 scene.background = spaceTexture;
@@ -58,10 +87,12 @@ const normalTexture = new THREE.TextureLoader().load('images/normal.jpeg')
 
 // Sun
 const sunTexture = new THREE.TextureLoader().load('images/sun.jpeg')
+const sunMap = new THREE.TextureLoader().load('images/sunmap.jpeg')
 const sun = new THREE.Mesh(
   new THREE.SphereGeometry(10,32,32),
   new THREE.MeshStandardMaterial({
     map: sunTexture,
+    normalMap: sunMap
   })
 );
 scene.add(sun)
@@ -74,8 +105,7 @@ const mercury = new THREE.Mesh(
   new THREE.MeshStandardMaterial({
     map: mercuryTexture,
     normalMap: normalTexture
-  }
-  )
+  })
 );
 mercury.position.z = 1;
 mercury.position.setX(-20);
@@ -90,7 +120,7 @@ const venus = new THREE.Mesh(
   )
 );
 venus.position.z = 1;
-venus.position.setX(-35);
+venus.position.setX(-45);
 
 // Earth
 const earthTexture = new THREE.TextureLoader().load('images/earth.jpeg')
@@ -103,29 +133,43 @@ const earth = new THREE.Mesh(
   })
 );
 earth.position.z = 1;
-earth.position.setX(-50);
+earth.position.setX(-80);
+
+// Earth Moon
+const moonTexture = new THREE.TextureLoader().load('images/moon.jpeg')
+const moon = new THREE.Mesh(
+  new THREE.SphereGeometry(1.6,32,32),
+  new THREE.MeshStandardMaterial({
+    map: moonTexture,
+    normalMap: normalTexture
+  })
+)
+moon.position.z = 1;
+moon.position.setX(-6);
+earth.add(moon)
 
 // Mars
 const marsTexture = new THREE.TextureLoader().load('images/mars.jpeg')
+const marsNormalMap = new THREE.TextureLoader().load('images/mars-normal.jpeg')
 const mars = new THREE.Mesh(
   new THREE.SphereGeometry(2.5,32,32),
   new THREE.MeshStandardMaterial({
     map: marsTexture,
-    normalMap: normalTexture
+    normalMap: marsNormalMap
   })
 );
 mars.position.z = 1;
-mars.position.setX(-80);
+mars.position.setX(-120);
 
 // Asteroid Belt (Note: as of now the asteroid belt is a flat torus, but we'll fix that in due time)
-const asteroidBeltPlaceholder = new THREE.Mesh(
-  new THREE.TorusGeometry(150,2,2,100),
-  new THREE.MeshBasicMaterial( { color: 0xffff00, wireFrame: true  })
-)
-asteroidBeltPlaceholder.position.z = 1;
-asteroidBeltPlaceholder.position.setX(0)
-asteroidBeltPlaceholder.rotateX( Math.PI / 2 );
-scene.add(asteroidBeltPlaceholder)
+// const asteroidBeltPlaceholder = new THREE.Mesh(
+//   new THREE.TorusGeometry(150,2,2,100),
+//   new THREE.MeshBasicMaterial( { color: 0xffff00, wireFrame: true  })
+// )
+// asteroidBeltPlaceholder.position.z = 1;
+// asteroidBeltPlaceholder.position.setX(0)
+// asteroidBeltPlaceholder.rotateX( Math.PI / 2 );
+//scene.add(asteroidBeltPlaceholder)
 
 // Jupiter
 const jupiterTexture = new THREE.TextureLoader().load('images/jupiter.jpeg')
@@ -159,7 +203,7 @@ const saturnRings = new THREE.Mesh(
   })
 )
 saturn.add(saturnRings)
-saturnRings.rotateX(240);
+saturnRings.rotateX( Math.PI / 2 );
 
 // Uranus
 const uranusTexture = new THREE.TextureLoader().load('images/uranus.jpeg')
@@ -170,7 +214,7 @@ const uranus = new THREE.Mesh(
   })
 );
 uranus.position.z = 1;
-uranus.position.setX(-970);
+uranus.position.setX(-870);
 
 // Neptune
 const neptuneTexture = new THREE.TextureLoader().load('images/neptune.jpeg')
@@ -181,17 +225,17 @@ const neptune = new THREE.Mesh(
   })
 );
 neptune.position.z = 1;
-neptune.position.setX(-1940);
+neptune.position.setX(-1140);
 
 // Add Each planet as a child to the sun
-sun.add(mercury)
-sun.add(venus)
-sun.add(earth)
-sun.add(mars)
-sun.add(jupiter)
-sun.add(saturn)
-sun.add(uranus)
-sun.add(neptune)
+scene.add(mercury)
+scene.add(venus)
+scene.add(earth)
+scene.add(mars)
+scene.add(jupiter)
+scene.add(saturn)
+scene.add(uranus)
+scene.add(neptune)
 
 // Game Loop (this is the main function where everything takes place)
 function animate() {
@@ -203,20 +247,20 @@ function animate() {
   venus.rotation.y += 0.001;
   earth.rotation.y += 0.01;
   mars.rotation.y += 0.01;
-  jupiter.rotation.y += 0.05;
+  jupiter.rotation.y += 0.001;
   saturn.rotation.y += 0.03;
   uranus.rotation.y += 0.03;
   neptune.rotation.y += 0.03;
 
   // rotateAboutPoint makes an object rotate on a designated pivot point
-  rotateAboutPoint(mercury, new THREE.Vector3(sun.x, sun.y, sun.z), new THREE.Vector3(0, .9, 0), THREE.Math.degToRad(1), true)
-  rotateAboutPoint(venus, new THREE.Vector3(sun.x, sun.y, sun.z), new THREE.Vector3(0, -.319, 0), THREE.Math.degToRad(1), true)
-  rotateAboutPoint(earth, new THREE.Vector3(sun.x, sun.y, sun.z), new THREE.Vector3(0, .194, 0), THREE.Math.degToRad(1), true)
-  rotateAboutPoint(mars, new THREE.Vector3(sun.x, sun.y, sun.z), new THREE.Vector3(0, .129, 0), THREE.Math.degToRad(1), true)
-  rotateAboutPoint(jupiter, new THREE.Vector3(sun.x, sun.y, sun.z), new THREE.Vector3(0, .09, 0), THREE.Math.degToRad(1), true)
-  rotateAboutPoint(saturn, new THREE.Vector3(sun.x, sun.y, sun.z), new THREE.Vector3(0, .03, 0), THREE.Math.degToRad(1), true)
-  rotateAboutPoint(uranus, new THREE.Vector3(sun.x, sun.y, sun.z), new THREE.Vector3(0, .05, 0), THREE.Math.degToRad(1), true)
-  rotateAboutPoint(neptune, new THREE.Vector3(sun.x, sun.y, sun.z), new THREE.Vector3(0, .01, 0), THREE.Math.degToRad(1), true)
+  rotateAboutPoint(mercury, new THREE.Vector3(sun.x, sun.y, sun.z), new THREE.Vector3(0, .9, 0), THREE.Math.degToRad(1), false)
+  rotateAboutPoint(venus, new THREE.Vector3(sun.x, sun.y, sun.z), new THREE.Vector3(0, -.319, 0), THREE.Math.degToRad(1), false)
+  rotateAboutPoint(earth, new THREE.Vector3(sun.x, sun.y, sun.z), new THREE.Vector3(0, .194, 0), THREE.Math.degToRad(1), false)
+  rotateAboutPoint(mars, new THREE.Vector3(sun.x, sun.y, sun.z), new THREE.Vector3(0, .129, 0), THREE.Math.degToRad(1), false)
+  rotateAboutPoint(jupiter, new THREE.Vector3(sun.x, sun.y, sun.z), new THREE.Vector3(0, .09, 0), THREE.Math.degToRad(1), false)
+  rotateAboutPoint(saturn, new THREE.Vector3(sun.x, sun.y, sun.z), new THREE.Vector3(0, .03, 0), THREE.Math.degToRad(1), false)
+  rotateAboutPoint(uranus, new THREE.Vector3(sun.x, sun.y, sun.z), new THREE.Vector3(0, .05, 0), THREE.Math.degToRad(1), false)
+  rotateAboutPoint(neptune, new THREE.Vector3(sun.x, sun.y, sun.z), new THREE.Vector3(0, .01, 0), THREE.Math.degToRad(1), false)
 
   // update the Orbit Controls on each frame
   controls.update();
