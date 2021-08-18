@@ -1,8 +1,6 @@
 import './style.css'
 
-// Import the THREE.js library
 import * as THREE from 'three';
-// Import OrbitControls which allow users to easily pan and zoom through a scene
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 // Create the main scene (this is where all the action is going to take place).
