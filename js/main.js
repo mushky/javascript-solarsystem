@@ -22,26 +22,19 @@ import neptune from './planets/neptune';
 
 import rotateAboutPoint from './utilities/rotateAboutPoint';
 
-// Create the main scene (this is where all the action is going to take place).
+// The scene is where everything takes place
 const scene = new THREE.Scene();
-
-// Create a camera, for a user to actually see what's going on in the scene. Think of what we're doing as if we were creating a movie.
 const camera = new THREE.PerspectiveCamera(100, window.innerWidth / window.innerHeight, 0.1, 1000);
-
-// Initialize a renderer. This is what's going to handle all the graphics we're going to be throwing onto the scene.
 const renderer = new THREE.WebGLRenderer({
   canvas: document.querySelector('#bg'),
 });
 
-// We can determine the pixel ratio by the window size of the user
-renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setPixelRatio(window.devicePixelRatio); // We can determine the pixel ratio by the window size of the user
 renderer.setSize(window.innerWidth, window.innerHeight);
 
-// Set the initial camera positions
 camera.position.setZ(130);
 camera.position.setY(150);
 
-// Use the initialized renderer we initialized earlier to add the scene and camera to the render pipeline.
 renderer.render(scene,camera);
 
 // Add Point lights
@@ -55,67 +48,53 @@ scene.add(gridHelper)
 
 // Initialize the Orbit Controls
 const controls = new OrbitControls(camera, renderer.domElement);
-// How far you can orbit vertically, upper and lower limits.
-// Range is 0 to Math.PI radians.
+
+// How far you can orbit vertically, upper and lower limits. 
 controls.minPolarAngle = 0; // radians
 controls.maxPolarAngle = Math.PI; // radians
 
 // How far you can orbit horizontally, upper and lower limits.
 // If set, must be a sub-interval of the interval [ - Math.PI, Math.PI ].
-controls.minAzimuthAngle = - Infinity; // radians
+controls.minAzimuthAngle = -Infinity; // radians
 controls.maxAzimuthAngle = Infinity; // radians
-// Bring in our space texture for the background image of the entire scene.
+
 const spaceTexture = new THREE.TextureLoader().load('images/milkywaybackground.jpeg')
 scene.background = spaceTexture;
 
-// This is the section where we add the sun and all of its planets. 
-// As of now I have everything as a child of the sun.
-
-// Sun
+/* 
+  This is the section where we add the sun and all of its planets. As of now I have everything as a child of the sun.
+*/
 scene.add(sun)
 sun.position.z = 1;
 
-// Mercury
 mercury.position.z = 1;
 mercury.position.setX(-20);
 
-// Venus
 venus.position.z = 1;
 venus.position.setX(-45);
 
-// Earth
 earth.position.z = 1;
 earth.position.setX(-80);
 
-// Earth Moon
 moon.position.z = 1;
 moon.position.setX(-6);
 earth.add(moon)
 
-// Mars
 mars.position.z = 1;
 mars.position.setX(-120);
 
-// Asteroid Belt (Note: as of now the asteroid belt is a flat torus, but we'll fix that in due time)
-//scene.add(asteroidBeltPlaceholder)
-
-// Jupiter
 jupiter.position.z = 1;
 jupiter.position.setX(-260);
 
-// Saturn (saturn has rings that are a child to saturn)
 saturn.position.z = 1;
 saturn.position.setX(-500);
 
-// Saturn Rings
 saturn.add(saturnRings)
 saturnRings.rotateX( Math.PI / 2 );
 
-// Uranus
 uranus.position.z = 1;
 uranus.position.setX(-870);
 
-// Neptune
 neptune.position.z = 1;
 neptune.position.setX(-1140);
 
