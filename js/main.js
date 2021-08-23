@@ -3,6 +3,9 @@ import './../style.css'
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
+import { camera, renderer } from './camera/mainCamera'; 
+import gridHelper from './helpers/gridHelper';
+
 import { 
   pointLightNorth, pointLightSouth, pointLightWest, 
   pointLightEast, pointLightNorthWest, pointLightNorthEast} 
@@ -24,17 +27,8 @@ import rotateAboutPoint from './utilities/rotateAboutPoint';
 
 // The scene is where everything takes place
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(100, window.innerWidth / window.innerHeight, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer({
-  canvas: document.querySelector('#bg'),
-});
 
-renderer.setPixelRatio(window.devicePixelRatio); // We can determine the pixel ratio by the window size of the user
-renderer.setSize(window.innerWidth, window.innerHeight);
-
-camera.position.setZ(130);
-camera.position.setY(150);
-
+// Camera and Renderer are found in mainCamera.js
 renderer.render(scene,camera);
 
 // Add Point lights
@@ -43,10 +37,10 @@ scene.add(
   pointLightEast,pointLightNorthWest,pointLightNorthEast
 );
 
-const gridHelper = new THREE.GridHelper(2200,100)
+// Grid Helper creates a cool 2d grid on the scene
 scene.add(gridHelper)
 
-// Initialize the Orbit Controls
+// Initialize Orbit Controls
 const controls = new OrbitControls(camera, renderer.domElement);
 
 // How far you can orbit vertically, upper and lower limits. 
