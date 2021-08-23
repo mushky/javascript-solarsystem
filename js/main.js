@@ -3,6 +3,11 @@ import './../style.css'
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
+import { 
+  pointLightNorth, pointLightSouth, pointLightWest, 
+  pointLightEast, pointLightNorthWest, pointLightNorthEast} 
+from './lighting/pointLights';
+
 import sun from './planets/sun';
 import mercury from './planets/mercury';
 import venus from './planets/venus';
@@ -14,6 +19,8 @@ import saturn from './planets/saturn';
 import saturnRings from './planets/saturnRings';
 import uranus from './planets/uranus';
 import neptune from './planets/neptune';
+
+import rotateAboutPoint from './utilities/rotateAboutPoint';
 
 // Create the main scene (this is where all the action is going to take place).
 const scene = new THREE.Scene();
@@ -37,42 +44,15 @@ camera.position.setY(150);
 // Use the initialized renderer we initialized earlier to add the scene and camera to the render pipeline.
 renderer.render(scene,camera);
 
-// Create a pointlight (this is exactly what it sounds like)
-const pointLightNorth = new THREE.PointLight(0xdfffff,0.9);
-pointLightNorth.position.set(0,50,0)
-
-const pointLightSouth = new THREE.PointLight(0xdfffff,0.9);
-pointLightSouth.position.set(0,-50,0)
-
-const pointLightWest = new THREE.PointLight(0xdfffff,0.9);
-pointLightWest.position.set(-50,0,0)
-
-const pointLightEast = new THREE.PointLight(0xdfffff,0.9);
-pointLightEast.position.set(50,0,0)
-
-const pointLightNorthWest = new THREE.PointLight(0xdfffff,0.9);
-pointLightNorthWest.position.set(0,0,50)
-
-const pointLightNorthEast = new THREE.PointLight(0xdfffff,0.9);
-pointLightNorthEast.position.set(-0,0,-50)
-
-// Create an ambient light (this is a light that basically shows up on the entire scene)
-const ambientLight = new THREE.AmbientLight(0xffffff);
-scene.add(pointLightNorth,pointLightSouth,pointLightWest,pointLightEast,pointLightNorthWest,pointLightNorthEast);
-
-// Initialize cool helpers so we can see what we're doing better. 
-// The grid helper gives us a grid so we can see if things are actually lined up.
-// The light helper shows us where exactly our light source is coming from.
-const lightHelperNorth = new THREE.PointLightHelper(pointLightNorth)
-const lightHelperSouth = new THREE.PointLightHelper(pointLightSouth)
-const lightHelperWest = new THREE.PointLightHelper(pointLightWest)
-const lightHelperEast = new THREE.PointLightHelper(pointLightEast)
-const lightHelperNorthWest = new THREE.PointLightHelper(pointLightNorthWest)
-const lightHelperNorthEast = new THREE.PointLightHelper(pointLightNorthEast)
+// Add Point lights
+scene.add(
+  pointLightNorth,pointLightSouth,pointLightWest,
+  pointLightEast,pointLightNorthWest,pointLightNorthEast
+);
 
 const gridHelper = new THREE.GridHelper(2200,100)
 scene.add(gridHelper)
-//scene.add(lightHelperNorth,lightHelperSouth,lightHelperWest,lightHelperEast,lightHelperNorthWest,lightHelperNorthEast)
+
 // Initialize the Orbit Controls
 const controls = new OrbitControls(camera, renderer.domElement);
 // How far you can orbit vertically, upper and lower limits.
@@ -150,7 +130,7 @@ scene.add(uranus)
 scene.add(neptune)
 
 // Game Loop (this is the main function where everything takes place)
-function animate() {
+const animate = () => {
   requestAnimationFrame(animate);
 
   // Set rotation speed of each planetary object
@@ -182,27 +162,3 @@ function animate() {
 
 // Now call the animate function to set everything in motion
 animate();
-
-// obj - your object (THREE.Object3D or derived)
-// point - the point of rotation (THREE.Vector3)
-// axis - the axis of rotation (normalized THREE.Vector3)
-// theta - radian value of rotation
-// pointIsWorld - boolean indicating the point is in world coordinates (default = false)
-// Example Call: rotateAboutPoint(mercury, new THREE.Vector3(sun.x, sun.y, sun.z), new THREE.Vector3(0, .1, 0), THREE.Math.degToRad(1), true)
-function rotateAboutPoint(obj, point, axis, theta, pointIsWorld){
-  pointIsWorld = (pointIsWorld === undefined)? false : pointIsWorld;
-
-  if(pointIsWorld){
-    obj.parent.localToWorld(obj.position); // compensate for world coordinate
-  }
-
-  obj.position.sub(point); // remove the offset
-  obj.position.applyAxisAngle(axis, theta); // rotate the POSITION
-  obj.position.add(point); // re-add the offset
-
-  if(pointIsWorld){
-      obj.parent.worldToLocal(obj.position); // undo world coordinates compensation
-  }
-
-  //obj.rotateOnAxis(axis, theta); // rotate the OBJECT
-}
