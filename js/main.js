@@ -62,7 +62,8 @@ const spaceTexture = new THREE.TextureLoader().load('images/milkywaybackground.j
 scene.background = spaceTexture;
 
 /* 
-  This is the section where we add the sun and all of its planets. As of now I have everything as a child of the sun.
+  Add the sun and all of its planets. 
+  Everything is a child of the sun.
 */
 scene.add(sun)
 sun.position.z = 1;
